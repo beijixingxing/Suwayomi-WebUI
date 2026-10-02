@@ -22,6 +22,7 @@ import { getDefaultLanguages } from '@/base/utils/Languages.ts';
 import type { SelectSettingValue, SelectSettingValueDisplayInfo } from '@/base/components/settings/SelectSetting.tsx';
 import {
     AuthMode,
+    DownloadStorageType,
     KoreaderSyncChecksumMethod,
     KoreaderSyncConflictStrategy,
     StartSyncResult,
@@ -189,6 +190,21 @@ const WEB_UI_INTERFACE_TO_TRANSLATIONS: {
 };
 export const WEB_UI_INTERFACE_SELECT_VALUES: SelectSettingValue<WebUiInterface>[] = WEB_UI_INTERFACES.map(
     (webUIInterface) => [webUIInterface, WEB_UI_INTERFACE_TO_TRANSLATIONS[webUIInterface]],
+);
+
+const DOWNLOAD_STORAGE_TYPES = Object.values(DownloadStorageType);
+const DOWNLOAD_STORAGE_TYPE_TO_TRANSLATION: { [type in DownloadStorageType]: SelectSettingValueDisplayInfo } = {
+    [DownloadStorageType.Local]: {
+        text: msg`Local filesystem`,
+        description: msg`Store downloaded manga chapters in a local directory on the server`,
+    },
+    [DownloadStorageType.Webdav]: {
+        text: msg`WebDAV`,
+        description: msg`Store downloaded manga chapters on a remote WebDAV server`,
+    },
+};
+export const DOWNLOAD_STORAGE_TYPE_SELECT_VALUES: SelectSettingValue<DownloadStorageType>[] = DOWNLOAD_STORAGE_TYPES.map(
+    (type) => [type, DOWNLOAD_STORAGE_TYPE_TO_TRANSLATION[type]],
 );
 
 export const GLOBAL_UPDATE_INTERVAL = {

@@ -1968,6 +1968,7 @@ export type PartialSettingsType = Settings & {
     debugLogsEnabled?: Maybe<Scalars['Boolean']['output']>;
     downloadAsCbz?: Maybe<Scalars['Boolean']['output']>;
     downloadConversions?: Maybe<Array<SettingsDownloadConversionType>>;
+    downloadStorageType?: Maybe<DownloadStorageType>;
     downloadsPath?: Maybe<Scalars['String']['output']>;
     electronPath?: Maybe<Scalars['String']['output']>;
     excludeCompleted?: Maybe<Scalars['Boolean']['output']>;
@@ -2043,6 +2044,10 @@ export type PartialSettingsType = Settings & {
     webUIFlavor?: Maybe<WebUiFlavor>;
     webUIInterface?: Maybe<WebUiInterface>;
     webUIUpdateCheckInterval?: Maybe<Scalars['Float']['output']>;
+    webdavPassword?: Maybe<Scalars['String']['output']>;
+    webdavRemotePath?: Maybe<Scalars['String']['output']>;
+    webdavUrl?: Maybe<Scalars['String']['output']>;
+    webdavUsername?: Maybe<Scalars['String']['output']>;
 };
 
 export type PartialSettingsTypeInput = {
@@ -2131,6 +2136,11 @@ export type PartialSettingsTypeInput = {
     webUIFlavor?: InputMaybe<WebUiFlavor>;
     webUIInterface?: InputMaybe<WebUiInterface>;
     webUIUpdateCheckInterval?: InputMaybe<Scalars['Float']['input']>;
+    webdavPassword?: InputMaybe<Scalars['String']['input']>;
+    webdavRemotePath?: InputMaybe<Scalars['String']['input']>;
+    webdavUrl?: InputMaybe<Scalars['String']['input']>;
+    webdavUsername?: InputMaybe<Scalars['String']['input']>;
+    downloadStorageType?: InputMaybe<DownloadStorageType>;
 };
 
 export type PlatformInfo = {
@@ -3664,6 +3674,11 @@ export enum WebUiFlavor {
     Custom = 'CUSTOM',
     Vui = 'VUI',
     Webui = 'WEBUI',
+}
+
+export enum DownloadStorageType {
+    Local = 'LOCAL',
+    Webdav = 'WEBDAV',
 }
 
 export enum WebUiInterface {

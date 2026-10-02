@@ -33,6 +33,11 @@ export const SERVER_SETTINGS = gql`
         # downloader
         downloadAsCbz
         downloadsPath
+        downloadStorageType
+        webdavUrl
+        webdavUsername
+        webdavPassword
+        webdavRemotePath
         autoDownloadNewChapters
         excludeEntryWithUnreadChapters
         autoDownloadNewChaptersLimit

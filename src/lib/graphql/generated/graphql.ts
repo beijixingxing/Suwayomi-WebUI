@@ -3111,6 +3111,11 @@ export type ServerSettingsFragment = {
     webUIUpdateCheckInterval: number;
     downloadAsCbz: boolean;
     downloadsPath: string;
+    downloadStorageType: Types.DownloadStorageType;
+    webdavUrl: string;
+    webdavUsername: string;
+    webdavPassword: string;
+    webdavRemotePath: string;
     autoDownloadNewChapters: boolean;
     excludeEntryWithUnreadChapters: boolean;
     autoDownloadNewChaptersLimit: number;
@@ -3224,6 +3229,11 @@ export type ResetServerSettingsMutation = {
             webUIUpdateCheckInterval: number;
             downloadAsCbz: boolean;
             downloadsPath: string;
+            downloadStorageType: Types.DownloadStorageType;
+            webdavUrl: string;
+            webdavUsername: string;
+            webdavPassword: string;
+            webdavRemotePath: string;
             autoDownloadNewChapters: boolean;
             excludeEntryWithUnreadChapters: boolean;
             autoDownloadNewChaptersLimit: number;
@@ -3347,6 +3357,11 @@ export type UpdateServerSettingsMutation = {
             webUIUpdateCheckInterval: number;
             downloadAsCbz: boolean;
             downloadsPath: string;
+            downloadStorageType: Types.DownloadStorageType;
+            webdavUrl: string;
+            webdavUsername: string;
+            webdavPassword: string;
+            webdavRemotePath: string;
             autoDownloadNewChapters: boolean;
             excludeEntryWithUnreadChapters: boolean;
             autoDownloadNewChaptersLimit: number;
@@ -3466,6 +3481,11 @@ export type GetServerSettingsQuery = {
         webUIUpdateCheckInterval: number;
         downloadAsCbz: boolean;
         downloadsPath: string;
+        downloadStorageType: Types.DownloadStorageType;
+        webdavUrl: string;
+        webdavUsername: string;
+        webdavPassword: string;
+        webdavRemotePath: string;
         autoDownloadNewChapters: boolean;
         excludeEntryWithUnreadChapters: boolean;
         autoDownloadNewChaptersLimit: number;

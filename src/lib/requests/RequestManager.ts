@@ -315,7 +315,11 @@ import { GET_RESTORE_STATUS, VALIDATE_BACKUP } from '@/lib/graphql/backup/Backup
 import { DOWNLOAD_STATUS_SUBSCRIPTION } from '@/lib/graphql/download/DownloaderSubscription.ts';
 import { UPDATER_SUBSCRIPTION } from '@/lib/graphql/updater/UpdaterSubscription.ts';
 import { GET_SERVER_SETTINGS } from '@/lib/graphql/settings/SettingsQuery.ts';
-import { UPDATE_SERVER_SETTINGS } from '@/lib/graphql/settings/SettingsMutation.ts';
+import { TEST_WEBDAV_CONNECTION, UPDATE_SERVER_SETTINGS } from '@/lib/graphql/settings/SettingsMutation.ts';
+import type {
+    TestWebDavConnectionMutation,
+    TestWebDavConnectionMutationVariables,
+} from '@/lib/graphql/settings/SettingsMutation.ts';
 import { CLEAR_SERVER_CACHE } from '@/lib/graphql/image/ImageMutation.ts';
 import { RESET_WEBUI_UPDATE_STATUS, UPDATE_WEBUI } from '@/lib/graphql/server/ServerInfoMutation.ts';
 import { WEBUI_UPDATE_SUBSCRIPTION } from '@/lib/graphql/server/ServerInfoSubscription.ts';
@@ -3768,6 +3772,12 @@ export class RequestManager {
             });
 
         return [wrappedMutate, result];
+    }
+
+    public useTestWebDavConnection(
+        options?: MutationHookOptions<TestWebDavConnectionMutation, TestWebDavConnectionMutationVariables>,
+    ): AbortableApolloUseMutationResponse<TestWebDavConnectionMutation, TestWebDavConnectionMutationVariables> {
+        return this.doRequest(GQLMethod.USE_MUTATION, TEST_WEBDAV_CONNECTION, undefined, options);
     }
 
     public useGetLastGlobalUpdateTimestamp(

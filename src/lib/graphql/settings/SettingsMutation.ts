@@ -30,3 +30,30 @@ export const UPDATE_SERVER_SETTINGS = gql`
         }
     }
 `;
+
+export const TEST_WEBDAV_CONNECTION = gql`
+    mutation TEST_WEBDAV_CONNECTION($input: TestWebDavConnectionInput!) {
+        testWebDavConnection(input: $input) {
+            clientMutationId
+            success
+            message
+        }
+    }
+`;
+
+export type TestWebDavConnectionMutation = {
+    testWebDavConnection: {
+        clientMutationId?: string | null;
+        success: boolean;
+        message: string;
+    } | null;
+};
+
+export type TestWebDavConnectionMutationVariables = {
+    input: {
+        clientMutationId?: string | null;
+        url?: string | null;
+        username?: string | null;
+        password?: string | null;
+    };
+};

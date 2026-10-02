@@ -10,10 +10,15 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
 import { ListSubheader } from '@/base/components/lists/ListSubheader.tsx';
 import { useLingui } from '@lingui/react/macro';
 import { plural } from '@lingui/core/macro';
 import { TextSetting } from '@/base/components/settings/text/TextSetting.tsx';
+import { SelectSetting } from '@/base/components/settings/SelectSetting.tsx';
 import { requestManager } from '@/lib/requests/RequestManager.ts';
 import { DownloadAheadSetting } from '@/features/downloads/components/DownloadAheadSetting.tsx';
 import {
@@ -38,9 +43,15 @@ import { getErrorMessage } from '@/lib/HelperFunctions.ts';
 import { useAppTitle } from '@/features/navigation-bar/hooks/useAppTitle.ts';
 import { ListItemLink } from '@/base/components/lists/ListItemLink.tsx';
 import { AppRoutes } from '@/base/AppRoute.constants.ts';
-
+import { DownloadStorageType } from '@/lib/graphql/generated/graphql-base.types.ts';
+import { DOWNLOAD_STORAGE_TYPE_SELECT_VALUES } from '@/features/settings/Settings.constants.ts';
 type DownloadSettingsType = Pick<
     ServerSettings,
+    | 'downloadStorageType'
+    | 'webdavUrl'
+    | 'webdavUsername'
+    | 'webdavPassword'
+    | 'webdavRemotePath'
     | 'downloadAsCbz'
     | 'downloadsPath'
     | 'autoDownloadNewChapters'
@@ -65,6 +76,10 @@ export const DownloadSettings = () => {
         loading: areMetadataServerSettingsLoading,
         request: { error: metadataServerSettingsError, refetch: refetchMetadataServerSettings },
     } = useMetadataServerSettings();
+
+    // Test connection state
+    const [testConnection, { loading: testLoading, data: testResult, error: testError }] =
+        requestManager.useTestWebDavConnection();
 
     const loading = serverSettings.loading || areMetadataServerSettingsLoading || categories.loading;
     if (loading) {
@@ -98,12 +113,9 @@ export const DownloadSettings = () => {
         );
     }
 
-    const downloadSettings = serverSettings.data!.settings;
+    const downloadSettings = serverSettings.data!.settings as DownloadSettingsType;
 
-    const updateSetting = <Setting extends keyof DownloadSettingsType>(
-        setting: Setting,
-        value: DownloadSettingsType[Setting],
-    ): Promise<any> => {
+    const updateSetting = (setting: keyof DownloadSettingsType, value: any): Promise<any> => {
         const mutation = mutateSettings({ variables: { input: { settings: { [setting]: value } } } });
         mutation.catch((e) => makeToast(t`Failed to save changes`, 'error', getErrorMessage(e)));
 
@@ -114,17 +126,115 @@ export const DownloadSettings = () => {
         makeToast(t`Failed to save changes`, 'error', getErrorMessage(e)),
     );
 
+    const storageType = downloadSettings.downloadStorageType ?? DownloadStorageType.Local;
+
+    const handleTestConnection = () => {
+        const url = downloadSettings.webdavUrl || '';
+        const username = downloadSettings.webdavUsername || '';
+        const password = downloadSettings.webdavPassword || '';
+
+        testConnection({
+            variables: { input: { url, username, password } },
+        }).catch(() => {}); // errors handled via testError
+    };
+
+    const testStatus =
+        testResult?.testWebDavConnection?.success === true
+            ? 'success'
+            : testResult?.testWebDavConnection?.success === false
+              ? 'error'
+              : null;
+    const testMessage = testResult?.testWebDavConnection?.message ?? testError?.message ?? '';
+
     return (
         <List sx={{ pt: 0 }}>
-            <TextSetting
-                settingName={t`Download location`}
-                dialogDescription={t`The path to the directory on the server where downloaded files should get saved in`}
-                value={downloadSettings?.downloadsPath}
-                settingDescription={
-                    downloadSettings?.downloadsPath.length ? downloadSettings.downloadsPath : t`Default`
-                }
-                handleChange={(path) => updateSetting('downloadsPath', path)}
+            {/* Download storage type */}
+            <SelectSetting<DownloadStorageType>
+                settingName={t`Download storage type`}
+                value={storageType}
+                values={DOWNLOAD_STORAGE_TYPE_SELECT_VALUES}
+                handleChange={(type) => updateSetting('downloadStorageType', type)}
             />
+
+            {/* WebDAV config fields — only when WEBDAV selected */}
+            {storageType === DownloadStorageType.Webdav && (
+                <>
+                    <TextSetting
+                        settingName={t`WebDAV URL`}
+                        dialogDescription={t`The full URL of the WebDAV server (e.g. http://192.168.1.100:5005)`}
+                        value={downloadSettings.webdavUrl ?? ''}
+                        settingDescription={downloadSettings.webdavUrl || t`Not set`}
+                        handleChange={(url) => updateSetting('webdavUrl', url)}
+                    />
+                    <TextSetting
+                        settingName={t`Username`}
+                        dialogDescription={t`WebDAV username (leave blank if no authentication required)`}
+                        value={downloadSettings.webdavUsername ?? ''}
+                        settingDescription={downloadSettings.webdavUsername || t`Not set`}
+                        handleChange={(u) => updateSetting('webdavUsername', u)}
+                    />
+                    <TextSetting
+                        settingName={t`Password`}
+                        dialogDescription={t`WebDAV password`}
+                        value={downloadSettings.webdavPassword ?? ''}
+                        settingDescription={
+                            downloadSettings.webdavPassword ? '••••••••' : t`Not set`
+                        }
+                        handleChange={(p) => updateSetting('webdavPassword', p)}
+                    />
+                    <TextSetting
+                        settingName={t`Remote path`}
+                        dialogDescription={t`Remote directory path on the WebDAV server (e.g. manga)`}
+                        value={downloadSettings.webdavRemotePath ?? ''}
+                        settingDescription={downloadSettings.webdavRemotePath || t`Root`}
+                        handleChange={(p) => updateSetting('webdavRemotePath', p)}
+                    />
+
+                    {/* Test connection button */}
+                    <ListItem>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                            <Button
+                                variant="outlined"
+                                color={testStatus === 'success' ? 'success' : testStatus === 'error' ? 'error' : 'primary'}
+                                onClick={handleTestConnection}
+                                disabled={testLoading || !downloadSettings.webdavUrl}
+                            >
+                                {testLoading ? (
+                                    <CircularProgress size={20} />
+                                ) : testStatus === 'success' ? (
+                                    t`Connection successful`
+                                ) : testStatus === 'error' ? (
+                                    t`Connection failed`
+                                ) : (
+                                    t`Test connection`
+                                )}
+                            </Button>
+                            {testMessage && (
+                                <Typography
+                                    variant="body2"
+                                    color={testStatus === 'success' ? 'success.main' : 'error.main'}
+                                    sx={{ flex: 1 }}
+                                >
+                                    {testMessage}
+                                </Typography>
+                            )}
+                        </Box>
+                    </ListItem>
+                </>
+            )}
+
+            {/* Download location — only meaningful for local storage */}
+            {storageType === DownloadStorageType.Local && (
+                <TextSetting
+                    settingName={t`Download location`}
+                    dialogDescription={t`The path to the directory on the server where downloaded files should get saved in`}
+                    value={downloadSettings?.downloadsPath}
+                    settingDescription={
+                        downloadSettings?.downloadsPath.length ? downloadSettings.downloadsPath : t`Default`
+                    }
+                    handleChange={(path) => updateSetting('downloadsPath', path)}
+                />
+            )}
             <ListItem>
                 <ListItemText primary={t`Save as CBZ archive`} />
                 <Switch
