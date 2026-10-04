@@ -156,6 +156,15 @@ export const DownloadSettings = () => {
                 handleChange={(type) => updateSetting('downloadStorageType', type)}
             />
 
+            {/* WebDAV selected without a URL — the server falls back to local storage until it is set */}
+            {storageType === DownloadStorageType.Webdav && !downloadSettings.webdavUrl && (
+                <ListItem>
+                    <Typography variant="body2" color="warning.main">
+                        {t`Set the WebDAV URL to use WebDAV storage. Until then, downloads are stored locally.`}
+                    </Typography>
+                </ListItem>
+            )}
+
             {/* WebDAV config fields — only when WEBDAV selected */}
             {storageType === DownloadStorageType.Webdav && (
                 <>
