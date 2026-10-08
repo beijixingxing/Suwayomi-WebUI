@@ -138,12 +138,22 @@ export const DownloadSettings = () => {
         }).catch(() => {}); // errors handled via testError
     };
 
-    const testStatus =
-        testResult?.testWebDavConnection?.success === true
-            ? 'success'
-            : testResult?.testWebDavConnection?.success === false
-              ? 'error'
-              : null;
+    const testConnectionSucceeded = testResult?.testWebDavConnection?.success;
+    let testStatus: 'success' | 'error' | null = null;
+    if (testConnectionSucceeded === true) {
+        testStatus = 'success';
+    } else if (testConnectionSucceeded === false) {
+        testStatus = 'error';
+    }
+    const testButtonColor = testStatus ?? 'primary';
+
+    let testButtonLabel = t`Test connection`;
+    if (testStatus === 'success') {
+        testButtonLabel = t`Connection successful`;
+    } else if (testStatus === 'error') {
+        testButtonLabel = t`Connection failed`;
+    }
+
     const testMessage = testResult?.testWebDavConnection?.message ?? testError?.message ?? '';
 
     return (
@@ -186,9 +196,7 @@ export const DownloadSettings = () => {
                         settingName={t`Password`}
                         dialogDescription={t`WebDAV password`}
                         value={downloadSettings.webdavPassword ?? ''}
-                        settingDescription={
-                            downloadSettings.webdavPassword ? '••••••••' : t`Not set`
-                        }
+                        settingDescription={downloadSettings.webdavPassword ? '••••••••' : t`Not set`}
                         handleChange={(p) => updateSetting('webdavPassword', p)}
                     />
                     <TextSetting
@@ -204,19 +212,11 @@ export const DownloadSettings = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                             <Button
                                 variant="outlined"
-                                color={testStatus === 'success' ? 'success' : testStatus === 'error' ? 'error' : 'primary'}
+                                color={testButtonColor}
                                 onClick={handleTestConnection}
                                 disabled={testLoading || !downloadSettings.webdavUrl}
                             >
-                                {testLoading ? (
-                                    <CircularProgress size={20} />
-                                ) : testStatus === 'success' ? (
-                                    t`Connection successful`
-                                ) : testStatus === 'error' ? (
-                                    t`Connection failed`
-                                ) : (
-                                    t`Test connection`
-                                )}
+                                {testLoading ? <CircularProgress size={20} /> : testButtonLabel}
                             </Button>
                             {testMessage && (
                                 <Typography

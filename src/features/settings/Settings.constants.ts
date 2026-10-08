@@ -203,9 +203,8 @@ const DOWNLOAD_STORAGE_TYPE_TO_TRANSLATION: { [type in DownloadStorageType]: Sel
         description: msg`Store downloaded manga chapters on a remote WebDAV server`,
     },
 };
-export const DOWNLOAD_STORAGE_TYPE_SELECT_VALUES: SelectSettingValue<DownloadStorageType>[] = DOWNLOAD_STORAGE_TYPES.map(
-    (type) => [type, DOWNLOAD_STORAGE_TYPE_TO_TRANSLATION[type]],
-);
+export const DOWNLOAD_STORAGE_TYPE_SELECT_VALUES: SelectSettingValue<DownloadStorageType>[] =
+    DOWNLOAD_STORAGE_TYPES.map((type) => [type, DOWNLOAD_STORAGE_TYPE_TO_TRANSLATION[type]]);
 
 export const GLOBAL_UPDATE_INTERVAL = {
     default: d(12).hours.inWholeHours,
